@@ -8,6 +8,7 @@
 # This is a simple example for a custom action which utters "Hello World!"
 
 from typing import Any, Text, Dict, List
+import requests
 
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
@@ -23,7 +24,14 @@ class ActionHaystackSearch(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 # call hs api get the response and return it in dispatcher
-        dispatcher.utter_message(text="Calling haystack and returning search results....")
+        payload = {
+            "qeury": "Who should I contact about external funding?",
+            "num_results": 1
+        }
+        r = requests.post('http://127.0.0.1:8000/haystack-query/', json=payload)
+        r_json = r.json()
+
+        dispatcher.utter_message(json_message=r_json)
 
         return []
 
